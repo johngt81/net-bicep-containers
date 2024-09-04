@@ -1,0 +1,5 @@
+ az group create -g ModuleDemo -l northcentralus
+
+ az deployment group create -g ModuleDemo -f .\.infra\main_modules.bicep
+
+ az group delete -g ModuleDemo

@@ -1,0 +1,33 @@
+az group create -g miGrupoDeRecursos -l northcentralus
+
+az deployment group create --resource-group miGrupoDeRecursos --template-file main.bicep --parameters @parameters.json
+
+
+ az deployment group create --resource-group miGrupoDeRecursos --template-file main.bicep --parameters parameters.dev.json
+
+
+ az deployment group create --resource-group miGrupoDeRecursos --template-file function.bicep --parameters parameters.dev.json
+
+
+
+  az deployment group create --resource-group miGrupoDeRecursos --template-file identity.bicep
+  az deployment group create --resource-group miGrupoDeRecursos --template-file container.bicep
+
+
+1. Implementacion de CI a Container registry
+
+Crear resource group
+az group create -g miGrupoDeRecursos -l northcentralus
+
+Crear registro
+az deployment group create --resource-group miGrupoDeRecursos --template-file registry.bicep
+
+Crear app service
+az deployment group create --resource-group miGrupoDeRecursos --template-file containerapp.bicep
+
+Azure Portal
+Crear ServiceConnection a
+- ARM
+- Azure Container Registry
+
+2. Implementacion CD

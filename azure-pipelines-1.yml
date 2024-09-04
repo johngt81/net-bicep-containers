@@ -1,0 +1,61 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+ - None
+
+variables:
+  IISWebsiteName: 'AzureTestsProject'
+
+resources:
+ pipelines:
+     - pipeline: 'buildPipeline'
+       project: 'Learning'
+       source: 'Build Pipeline'
+       branch: 'master'
+
+stages:
+ - stage: DeployWebsite
+   displayName: 'Deploy Website'
+   pool:
+     vmImage: windows-latest
+     
+   jobs:
+   - deployment: DeployWebsite
+     displayName: 'Deploy website'
+     environment: 'Windows Server.DESKTOP-UNMDAJQ'
+     strategy:
+      runOnce:
+         deploy:
+           steps:
+             - checkout: none
+             - download: 'buildPipeline'
+               name: 'DownloadBuildArtifacts'
+               displayName: 'Download Build Artifacts'
+               artifact: 'AzureTestProject'
+
+             - task: IISWebAppManagementOnMachineGroup@0
+               name: 'StopIIS'
+               displayName: 'Stop IIS Website'
+               inputs:
+                 IISDeploymentType: 'IISWebsite'
+                 ActionIISWebsite: 'StopWebsite'
+                 StartStopWebsiteName: '${{ variables.IISWebsiteName }}'
+            
+             - task: IISWebAppDeploymentOnMachineGroup@0
+               name: 'DeployIIS'
+               displayName: 'Deploy IIS Website'
+               inputs:
+                WebSiteName: '${{ variables.IISWebsiteName }}'
+                Package: '$(Pipeline.Workspace)\buildPipeline\AzureTestProject\WeatherApp'
+                TakeAppOfflineFlag: true
+            
+             - task: IISWebAppManagementOnMachineGroup@0
+               name: 'StartIIS'
+               displayName: 'Start IIS Website'
+               inputs:
+                IISDeploymentType: 'IISWebsite'
+                ActionIISWebsite: 'StartWebsite'
+                StartStopWebsiteName: '${{ variables.IISWebsiteName }}'

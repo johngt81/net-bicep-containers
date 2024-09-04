@@ -1,0 +1,25 @@
+trigger:
+- main
+
+variables:
+    containerName: 'app-productsapi-dev-001'
+    resourceGroupName: 'miGrupoDeRecursos'
+    containerImage: 'crproductsapidev001.azurecr.io/productsapi:latest'
+    vmImage: 'ubuntu-latest'
+stages:
+    - stage: Release
+      displayName: Release
+      jobs:
+          - job: Release
+            displayName: Release Service App
+            pool:
+                vmImage: $(vmImage)
+            steps:
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: 'arm_connection'
+                scriptType: 'bash'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                 'az login --identity --username acrIdentity
+                  az webapp config container set --name $(containerName) --resource-group $(resourceGroupName) --container-image-name $(containerImage)'

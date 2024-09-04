@@ -1,0 +1,32 @@
+# Stage 1: Build the API project
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy the API project files and restore dependencies
+COPY ["WeatherApp/WeatherApp.csproj", "WeatherApp/"]
+RUN dotnet restore "WeatherApp/WeatherApp.csproj"
+
+# Copy the rest of the API project files and build the project
+COPY WeatherApp/. ./WeatherApp/
+WORKDIR /src/WeatherApp
+RUN dotnet publish -c Release -o /app/publish
+
+# Stage 2: Build the Test project
+# FROM mcr.microsoft.com/dotnet/sdk:8.0 AS test
+# WORKDIR /src
+
+# Copy the Test project files and restore dependencies
+# COPY ["WeatherAppTests/WeatherAppTests.csproj", "WeatherAppTests/"]
+# RUN dotnet restore "WeatherAppTests/WeatherAppTests.csproj"
+
+# Copy the rest of the Test project files and build the project
+# COPY WeatherAppTests/. ./WeatherAppTests/
+# WORKDIR /src/WeatherAppTests
+# RUN dotnet build -c Release
+
+# Stage 3: Create the final image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "WeatherApp.dll"]
