@@ -1,0 +1,40 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+variables:  
+  IMAGE_NAME: crproductsapidev002.azurecr.io/productsapi:latest
+  CONTAINERAPPS_APP: app-productsapi-dev-001
+  CONTAINERAPPS_ENVIRONMENT: env-productsapi-dev-001
+  RESOURCE_GROUP: weather-app-resource-group
+  TAG: '$(Build.BuildId)'
+  dockerRegistryServiceConnection: 'crproductsapidev002'
+  imageRepository: 'productsapi'
+  containerRegistry: 'crproductsapidev002.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+pool:
+  vmImage: ubuntu-latest
+ 
+stages:
+  - stage: Build
+    displayName: Build and push image
+    jobs:
+      - job: Build
+        displayName: Build and Push an Image
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+         - task: Docker@2
+           displayName: Build and push an image to container registry
+           inputs:
+            command: buildAndPush
+            repository: $(imageRepository)
+            dockerfile: $(dockerfilePath)
+            containerRegistry: $(dockerRegistryServiceConnection)
+            tags: |
+               $(TAG)
+               latest
