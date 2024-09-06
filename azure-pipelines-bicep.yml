@@ -38,3 +38,21 @@ stages:
             tags: |
                $(TAG)
                latest
+  - stage: Deploy
+    displayName: Deploy to Container Apps
+    jobs:
+      - job: Deploy
+        displayName: Deploy
+        pool: 
+         vmImage: ubuntu-latest
+        steps:
+         - task: AzureContainerApps@1
+           displayName: Deploy new container version
+           inputs:
+              imageToDeploy: '$(IMAGE_NAME)'
+              containerAppName: '$(CONTAINERAPPS_APP)'
+              resourceGroup: '$(RESOURCE_GROUP)'
+              containerAppEnvironment: '$(CONTAINERAPPS_ENVIRONMENT)'
+              targetPort: '3500'
+              ingress: 'external'
+          
