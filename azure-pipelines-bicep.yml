@@ -56,4 +56,7 @@ stages:
               containerAppEnvironment: '$(CONTAINERAPPS_ENVIRONMENT)'
               targetPort: '3500'
               ingress: 'external'
+              acrUsername: $(acrUsername)
+              acrPassword: $(acrPassword)
+            
           
