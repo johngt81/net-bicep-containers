@@ -49,6 +49,7 @@ stages:
          - task: AzureContainerApps@1
            displayName: Deploy new container version
            inputs:
+              connectedServiceNameARM: 'arm_weather_connection'
               imageToDeploy: '$(IMAGE_NAME)'
               containerAppName: '$(CONTAINERAPPS_APP)'
               resourceGroup: '$(RESOURCE_GROUP)'
