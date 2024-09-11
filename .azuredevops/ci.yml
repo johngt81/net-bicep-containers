@@ -49,10 +49,16 @@ stages:
       pool: 
         vmImage: $(vmImageName)
       steps:
+      - task: AzureKeyVault@2
+        inputs:
+          azureSubscription: 'arm_weather_connection3'
+          KeyVaultName: 'kv-productsapi3'
+          SecretsFilter: '*'
+          RunAsPreJob: false
       - task: AzureContainerApps@1
         displayName: Deploy new container version
         inputs:
-          connectedServiceNameARM: 'arm_weather_connection'
+          connectedServiceNameARM: 'arm_weather_connection3'
           imageToDeploy: '$(IMAGE_NAME)'
           containerAppName: '$(CONTAINERAPPS_APP)'
           resourceGroup: '$(RESOURCE_GROUP)'
