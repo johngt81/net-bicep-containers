@@ -54,7 +54,28 @@ stages:
           azureSubscription: 'arm_weather_connection3'
           KeyVaultName: 'kv-productsapi3'
           SecretsFilter: '*'
-          RunAsPreJob: false
+          RunAsPreJob: true
+      
+      - task: CmdLine@2
+        displayName: Write secrets into file
+        inputs:
+          script: |
+            echo $(acrUsername)
+            echo $(acrUsername) > secret.txt
+            echo $(acrPassword)
+            echo $(acrPassword) > secret.txt
+
+      - task: CopyFiles@2
+        inputs:
+          Contents: 'secret.txt'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
       - task: AzureContainerApps@1
         displayName: Deploy new container version
         inputs:
