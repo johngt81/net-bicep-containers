@@ -53,6 +53,8 @@ param minReplicas int = 1
 @maxValue(25)
 param maxReplicas int = 3
 
+param tenantId string = subscription().tenantId
+
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: containerAppLogAnalyticsName
   location: location
@@ -80,29 +82,46 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
   }
 }
 
-module managedIdentity 'managed_identity.bicep' = {
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: 'identity-productsapi'
-  params: {
-    location: location
-    name: 'identity-productsapi'
+  location: location
+}
+
+resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
+  name: 'kv-productsapi'
+  location: location
+  properties: {
+    tenantId: tenantId
+    accessPolicies: [
+      {
+        tenantId: tenantId
+        objectId: managedIdentity.properties.principalId
+        permissions: {
+          secrets: [
+            'list'
+            'get'
+          ]
+        }
+      }
+    ]
+    sku: {
+      name: 'standard'
+      family: 'A'
+    }
   }
 }
 
-module keyVault 'keyvault.bicep' = {
-  name: 'keyvault-productsapi'
-  params: {
-    location: location
-    keyVaultName: 'kv-productsapi'
+resource secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+  parent: keyVault
+  name: 'mySecret'
+  properties: {
+    value: 'mySecretValue'
   }
 }
 
 resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
   name: containerAppName
   location: location
-  dependsOn: [
-    managedIdentity
-    keyVault
-  ]
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -126,7 +145,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       secrets: [
         {
           name: 'mycontainersecret'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.outputs.keyVaultName};SecretName=mySecret)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=mySecret)'
         }
       ]
     }
