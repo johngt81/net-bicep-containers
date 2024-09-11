@@ -9,9 +9,8 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: 'crproductsapidev001'
+  dockerRegistryServiceConnection: 'crproductsapidev003'
   imageRepository: 'productsapi'
-  containerRegistry: 'crproductsapidev001.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
   latestTag: 'latest'
