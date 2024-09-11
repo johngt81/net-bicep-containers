@@ -9,15 +9,12 @@ resources:
 - repo: self
 
 variables:
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'crproductsapidev001'
   imageRepository: 'productsapi'
   containerRegistry: 'crproductsapidev001.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
   latestTag: 'latest'
-
-  # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:

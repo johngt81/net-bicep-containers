@@ -1,30 +1,23 @@
 @description('Specifies the Azure location where the key vault should be created.')
 param location string = resourceGroup().location
 @description('Specifies the name of the key vault.')
-param keyVaultName string = 'kv-productsapi'
-
+param keyVaultName string = 'kv-productsapi3'
 param tenantId string = subscription().tenantId
-
-module managedIdentity 'managed_identity.bicep' = {
-  name: 'identity-productsapi'
-  params: {
-    location: location
-    name: 'identity-productsapi'
-  }
-}
+@secure()
+param acrUsername string
+@secure()
+param acrPassword string
+param principalId string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
   name: keyVaultName
   location: location
-  dependsOn: [
-    managedIdentity
-  ]
   properties: {
     tenantId: tenantId
     accessPolicies: [
       {
         tenantId: tenantId
-        objectId: managedIdentity.outputs.principalId
+        objectId: principalId
         permissions: {
           secrets: [
             'list'
@@ -40,11 +33,19 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
   }
 }
 
-resource secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+resource secretUsername 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   parent: keyVault
-  name: 'mySecret'
+  name: 'acrUsername'
   properties: {
-    value: 'mySecretValue'
+    value: acrUsername
+  }
+}
+
+resource secretPassword 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+  parent: keyVault
+  name: 'acrPassword'
+  properties: {
+    value: acrPassword
   }
 }
 

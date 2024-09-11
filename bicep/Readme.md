@@ -12,3 +12,16 @@ az deployment group create --resource-group weather-app-resource-group --templat
 
 # Create Container App
 az deployment group create --resource-group weather-app-resource-group --template-file containerapp2.bicep
+
+-----------------------------
+# Create Resource Group
+az group create -g weather-app-resource-group3 -l northcentralus
+
+# Create Container Registry
+az deployment group create --resource-group weather-app-resource-group3 --template-file registry.bicep
+
+
+
+
+
+
