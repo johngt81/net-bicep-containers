@@ -143,13 +143,14 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       secrets: [
         {
           name: 'test'
-          value: 'https://${keyVault.name}.vault.azure.net/secrets/test'
-          // keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/test/85926d65611340c087c47e830dcef89b'
-          // identity: managedIdentity.name
+          // value: 'https://${keyVault.name}.vault.azure.net/secrets/test'
+          keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/test'
+          identity: managedIdentity.name
           // identity: managedIdentity.name
           // value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=mySecret)'
         }
       ]
+      activeRevisionsMode: 'Multiple'
     }
     template: {
       revisionSuffix: 'firstrevision'

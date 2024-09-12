@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -45,6 +48,21 @@ app.MapGet("/hello", () =>
     return message;
 })
 .WithName("Hello")
+.WithOpenApi();
+
+
+app.MapGet("/all", () =>
+{
+    var variables = Environment.GetEnvironmentVariables().Cast<DictionaryEntry>();
+    var builder = new StringBuilder();
+    foreach (var entry in variables)
+    {
+        builder.AppendLine($"{entry.Key} = {entry.Value}");
+    }
+    var message = builder.ToString();
+    return message;
+})
+.WithName("All")
 .WithOpenApi();
 
 app.Run();
