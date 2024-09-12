@@ -49,4 +49,12 @@ resource secretPassword 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   }
 }
 
+resource secretTest 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
+  parent: keyVault
+  name: 'test'
+  properties: {
+    value: 'Test Value'
+  }
+}
+
 output keyVaultName string = keyVault.name
