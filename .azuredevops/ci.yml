@@ -9,12 +9,17 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: 'crproductsapidev001'
+  dockerRegistryServiceConnection: 'crproductsapidev003'
   imageRepository: 'productsapi'
-  containerRegistry: 'crproductsapidev001.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
   latestTag: 'latest'
+  
+  IMAGE_NAME: crproductsapidev003.azurecr.io/productsapi:latest
+  CONTAINERAPPS_APP: app-productsapi-dev-003
+  CONTAINERAPPS_ENVIRONMENT: env-productsapi-dev-003
+  RESOURCE_GROUP: weather-app-resource-group3
+
   vmImageName: 'ubuntu-latest'
 
 stages:
@@ -36,6 +41,51 @@ stages:
         tags: |
           $(tag)
           $(latestTag)
+- stage: Deploy
+  displayName: Deploy to Container Apps
+  jobs:
+    - job: Deploy
+      displayName: Deploy
+      pool: 
+        vmImage: $(vmImageName)
+      steps:
+      - task: AzureKeyVault@2
+        inputs:
+          azureSubscription: 'arm_weather_connection3'
+          KeyVaultName: 'kv-productsapi3'
+          SecretsFilter: '*'
+          RunAsPreJob: true
+      
+      - task: CmdLine@2
+        displayName: Write secrets into file
+        inputs:
+          script: |
+            echo $(acrUsername)
+            echo $(acrUsername) > secret.txt
+            echo $(acrPassword)
+            echo $(acrPassword) > secret.txt
 
+      - task: CopyFiles@2
+        inputs:
+          Contents: 'secret.txt'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 
-
+      - task: AzureContainerApps@1
+        displayName: Deploy new container version
+        inputs:
+          connectedServiceNameARM: 'arm_weather_connection3'
+          imageToDeploy: '$(IMAGE_NAME)'
+          containerAppName: '$(CONTAINERAPPS_APP)'
+          resourceGroup: '$(RESOURCE_GROUP)'
+          containerAppEnvironment: '$(CONTAINERAPPS_ENVIRONMENT)'
+          targetPort: '8080'
+          ingress: 'external'
+          acrUsername: $(acrUsername)
+          acrPassword: $(acrPassword)
+            
