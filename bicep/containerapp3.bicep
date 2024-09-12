@@ -53,8 +53,6 @@ param minReplicas int = 1
 @maxValue(25)
 param maxReplicas int = 3
 
-param tenantId string = subscription().tenantId
-
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: containerAppLogAnalyticsName
   location: location
@@ -82,39 +80,12 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
   }
 }
 
-// module managedIdentity 'managed_identity.bicep' = {
-//   name: 'identity-productsapi3'
-//   params: {
-//     location: location
-//     name: 'identity-productsapi3'
-//   }
-// }
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' existing = {
   name: 'identity-productsapi3'
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
   name: 'kv-productsapi3'
-  // location: location
-  // properties: {
-  //   tenantId: tenantId
-  //   accessPolicies: [
-  //     {
-  //       tenantId: tenantId
-  //       objectId: managedIdentity.outputs.principalId
-  //       permissions: {
-  //         secrets: [
-  //           'list'
-  //           'get'
-  //         ]
-  //       }
-  //     }
-  //   ]
-  //   sku: {
-  //     name: 'standard'
-  //     family: 'A'
-  //   }
-  // }
 }
 
 resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
@@ -143,12 +114,18 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       secrets: [
         {
           name: 'test'
-          // value: 'https://${keyVault.name}.vault.azure.net/secrets/test'
-          keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/test'
-          identity: managedIdentity.name
-          // identity: managedIdentity.name
-          // value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=mySecret)'
+          value: 'https://${keyVault.name}.vault.azure.net/secrets/test'
         }
+        // {
+        //   name: 'test1'
+        //   keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/test'
+        //   identity: managedIdentity.name
+        // }
+        // {
+        //   name: 'test2'
+        //   value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=test)'
+        //   identity: managedIdentity.name
+        // }
       ]
       activeRevisionsMode: 'Multiple'
     }
@@ -163,6 +140,14 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
               name: 'MY_SECRET'
               secretRef: 'test'
             }
+            // {
+            //   name: 'MY_SECRET1'
+            //   secretRef: 'test1'
+            // }
+            // {
+            //   name: 'MY_SECRET2'
+            //   secretRef: 'test2'
+            // }
           ]
           resources: {
             cpu: json(cpuCore)
