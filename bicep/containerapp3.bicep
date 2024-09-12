@@ -115,18 +115,17 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
         {
           name: 'test'
           value: 'https://${keyVault.name}.vault.azure.net/secrets/test'
-          identity: managedIdentity.name
         }
         // {
         //   name: 'test1'
         //   keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/test'
         //   identity: managedIdentity.name
         // }
-        {
-          name: 'test2'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=test)'
-          identity: managedIdentity.name
-        }
+        // {
+        //   name: 'test2'
+        //   value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=test)'
+        //   identity: managedIdentity.name
+        // }
       ]
       activeRevisionsMode: 'Multiple'
     }
@@ -145,10 +144,10 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             //   name: 'MY_SECRET1'
             //   secretRef: 'test1'
             // }
-            {
-              name: 'MY_SECRET2'
-              secretRef: 'test2'
-            }
+            // {
+            //   name: 'MY_SECRET2'
+            //   secretRef: 'test2'
+            // }
           ]
           resources: {
             cpu: json(cpuCore)
