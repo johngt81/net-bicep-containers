@@ -4,13 +4,13 @@ param env string = 'dev'
 param location string = resourceGroup().location
 
 @description('Specifies the name of the container app.')
-param containerAppName string = 'app-productsapi-${env}-003'
+param containerAppName string = 'app-weatherapi-${env}-003'
 
 @description('Specifies the name of the container app environment.')
-param containerAppEnvName string = 'env-productsapi-${env}-003'
+param containerAppEnvName string = 'env-weatherapi-${env}-003'
 
 @description('Specifies the name of the log analytics workspace.')
-param containerAppLogAnalyticsName string = 'log-productsapi-${env}-003'
+param containerAppLogAnalyticsName string = 'log-weatherapi-${env}-003'
 
 @description('Specifies the docker container image to deploy.')
 param containerImage string = 'mcr.microsoft.com/appsvc/staticsite:latest'
@@ -81,11 +81,11 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
 }
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' existing = {
-  name: 'identity-productsapi3'
+  name: 'identity-weatherapi3'
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
-  name: 'kv-productsapi3'
+  name: 'kv-weatherapi3'
 }
 
 resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {

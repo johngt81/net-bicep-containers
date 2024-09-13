@@ -1,12 +1,17 @@
 @description('Specifies the Azure location where the key vault should be created.')
 param location string = resourceGroup().location
-@description('Specifies the name of the key vault.')
-param keyVaultName string = 'kv-productsapi3'
+
 param tenantId string = subscription().tenantId
+
+@description('Specifies the name of the key vault.')
+param keyVaultName string
+
 @secure()
 param acrUsername string
+
 @secure()
 param acrPassword string
+
 param principalId string
 
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {

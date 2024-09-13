@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param name string = 'identity-productsapi3'
+param name string
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: name
